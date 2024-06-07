@@ -1,0 +1,39 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="center">
+    <h1>Rickroll Me</h1>
+    <p>Create custom Rickrolls with ease</p>
+</div>
+<hr>
+<br>
+{% if New %}
+<div class="grid">
+    <div></div>
+    <form>
+        <fieldset>
+          <label>Custom URL Ending
+            <input name="urlEnding" placeholder="/my-url-ending"/>
+          </label>
+          <label>Site Title
+            <input name="siteTitle" placeholder="Rickroll Me - The Best Rickroll Maker"/>
+          </label>
+          <label>Site Name
+            <input name="siteName" placeholder="Rickroll Me"/>
+          </label>
+          <label>Link to Preview Image
+            <input name="imgLink" type="url" placeholder="https://example.com/img.png"/>
+          </label>
+          <label>Site Description
+              <textarea name="siteDescription" placeholder="Rickroll me is one of the best Rickroll creators on the planet. Not only is it..."></textarea>
+          </label>
+        </fieldset>
+        <input type="submit" value="Create Link"/>
+    </form>
+    <div></div>
+</div>
+{% else %}
+<br><br>
+<h2>h?</h2>
+{% endif %}
+
+{% endblock %}
