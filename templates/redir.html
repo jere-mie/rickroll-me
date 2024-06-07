@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% if Rickroll %}
+    <title>{{ Rickroll.SiteTitle }}</title>
+    <meta property="og:site_name" content="{{ Rickroll.SiteName }}" />
+    <meta property="og:title" content="{{ Rickroll.SiteTitle }}" />
+    <meta property="og:description" content="{{ Rickroll.SiteDescription }}" />
+    <meta property="og:image" content="{{ Rickroll.ImgLink }}" />
+    {% endif %}
+</head>
+<body>
+    <script>
+        setTimeout(() => { window.location.href="/rickrolled" }, 500);
+    </script>
+</body>
+</html>

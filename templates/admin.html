@@ -1,0 +1,22 @@
+{% extends "layout.html" %}
+{% block content %}
+<h1 class="center">Admin Panel</h1>
+<div class="row">
+    <div class="col-md-2"></div>
+    <div class="col-md-8">
+        <article id="errorCard" class="pico-background-pink-600 hidden">Error Message</article>
+        <form id="adminForm" onsubmit="submitAdminForm(); return false;">
+            <fieldset>
+                <label>Admin Password
+                    <input type="password" name="adminPassword">
+                </label>
+            </fieldset>
+            <input type="submit" value="Access Admin Panel" />
+        </form>
+        <ul id="linksList" class="hidden"></ul>
+    </div>
+</div>
+
+<script src="/static/admin.js"></script>
+
+{% endblock %}
