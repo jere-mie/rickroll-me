@@ -1,8 +1,9 @@
-package main
+package src
 
 type Rickroll struct {
 	ID              uint   `gorm:"primaryKey"`
 	URLEnding       string `gorm:"unique"`
+	Clicks          uint
 	SiteTitle       string
 	SiteName        string
 	ImgLink         string
@@ -18,11 +19,17 @@ type RickrollRequest struct {
 }
 
 type AdminPasswordRequest struct {
-	AdminPassword       string `json:"adminPassword"`
+	AdminPassword string `json:"adminPassword"`
+}
+
+type DeleteRequest struct {
+	ID            uint   `json:"id"`
+	AdminPassword string `json:"adminPassword"`
 }
 
 // used for returning all links in the admin panel
 type RickrollInfo struct {
 	ID        uint   `json:"id"`
 	URLEnding string `json:"urlEnding"`
+	Clicks    uint   `json:"clicks"`
 }

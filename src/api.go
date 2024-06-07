@@ -1,4 +1,4 @@
-package main
+package src
 
 import (
 	"fmt"
@@ -7,34 +7,7 @@ import (
 	"gorm.io/gorm"
 )
 
-func setupRoutes(app *fiber.App, db *gorm.DB) {
-	app.Get("/", func(c *fiber.Ctx) error {
-		return c.Render("index", fiber.Map{})
-	})
-
-	app.Get("/rickrolled", func(c *fiber.Ctx) error {
-		return c.Render("rickrolled", fiber.Map{})
-	})
-
-	app.Get("/admin", func(c *fiber.Ctx) error {
-		return c.Render("admin", fiber.Map{})
-	})
-
-	app.Get("/l/:urlEnding", func(c *fiber.Ctx) error {
-		urlEnding := c.Params("urlEnding")
-
-		// Find the Rickroll by URLEnding
-		var rickroll Rickroll
-		if err := db.Where("url_ending = ?", urlEnding).First(&rickroll).Error; err != nil {
-			// just return rickroll page without passing in any data
-			return c.Render("redir", fiber.Map{})
-		}
-
-		return c.Render("redir", fiber.Map{
-			"Rickroll": rickroll,
-		})
-	})
-
+func setupAPI(app *fiber.App, db *gorm.DB) {
 	app.Post("/admin", func(c *fiber.Ctx) error {
 		var req AdminPasswordRequest
 		if err := c.BodyParser(&req); err != nil {
@@ -43,9 +16,16 @@ func setupRoutes(app *fiber.App, db *gorm.DB) {
 			})
 		}
 		adminPassword := getEnv("RRM_ADMIN_PASSWORD", "")
-		if adminPassword != adminPassword {
+
+		// if the admin password hasn't been specified, that means we disable the admin panel
+		if len(adminPassword) < 1 {
+			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+				"error": "Admin panel has been disabled",
+			})
+		}
+		if req.AdminPassword != adminPassword {
 			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
-				"error": "Incorrect Admin Passeword",
+				"error": "Incorrect Admin Password",
 			})
 		}
 		// Query all Rickrolls and extract urlEndings and IDs
@@ -60,6 +40,7 @@ func setupRoutes(app *fiber.App, db *gorm.DB) {
 			rickrollInfos[i] = RickrollInfo{
 				ID:        r.ID,
 				URLEnding: r.URLEnding,
+				Clicks:    r.Clicks,
 			}
 		}
 
@@ -87,6 +68,7 @@ func setupRoutes(app *fiber.App, db *gorm.DB) {
 
 		// Create a new Rickroll record
 		newRickroll := Rickroll{
+			Clicks:          0,
 			URLEnding:       req.URLEnding,
 			SiteTitle:       req.SiteTitle,
 			SiteName:        req.SiteName,
@@ -102,6 +84,39 @@ func setupRoutes(app *fiber.App, db *gorm.DB) {
 		// return the resulting
 		return c.JSON(fiber.Map{
 			"link": fmt.Sprintf("/l/%s", newRickroll.URLEnding),
+		})
+	})
+
+	app.Post("/delete", func(c *fiber.Ctx) error {
+		adminPassword := getEnv("RRM_ADMIN_PASSWORD", "")
+		// if the admin password hasn't been specified, that means we disable the admin panel
+		if len(adminPassword) < 1 {
+			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+				"error": "Admin panel has been disabled",
+			})
+		}
+
+		var req DeleteRequest
+		if err := c.BodyParser(&req); err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+				"error": "Cannot parse JSON",
+			})
+		}
+
+		if req.AdminPassword != adminPassword {
+			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+				"error": "Unauthorized",
+			})
+		}
+
+		if err := db.Delete(&Rickroll{}, req.ID).Error; err != nil {
+			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+				"error": "Failed to delete Rickroll",
+			})
+		}
+
+		return c.JSON(fiber.Map{
+			"message": "Rickroll deleted successfully",
 		})
 	})
 

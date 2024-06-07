@@ -1,11 +1,12 @@
 {% extends "layout.html" %}
 {% block content %}
+<p><a href="/">Home</a></p>
 <h1 class="center">Admin Panel</h1>
 <div class="row">
     <div class="col-md-2"></div>
     <div class="col-md-8">
         <article id="errorCard" class="pico-background-pink-600 hidden">Error Message</article>
-        <form id="adminForm" onsubmit="submitAdminForm(); return false;">
+        <form id="adminForm">
             <fieldset>
                 <label>Admin Password
                     <input type="password" name="adminPassword">
@@ -13,10 +14,33 @@
             </fieldset>
             <input type="submit" value="Access Admin Panel" />
         </form>
-        <ul id="linksList" class="hidden"></ul>
+        <div class="overflow-auto">
+            <table id="linksTable" class="hidden">
+                <tr>
+                    <th>ID</th>
+                    <th>Clicks</th>
+                    <th>Actions</th>
+                    <th>Link</th>
+                </tr>
+                <tbody id="linksList">
+                    <template data-templateName="rowTemplate">
+                        <tr data-fieldName="row">
+                            <td data-fieldName="id"></td>
+                            <td data-fieldName="clicks"></td>
+                            <td data-fieldName="btn"></td>
+                            <td><a data-fieldName="link"></a></td>
+                        </tr>
+                    </template>
+                </tbody>
+            </table>    
+        </div>
     </div>
 </div>
-
-<script src="/static/admin.js"></script>
-
+<script src="/static/js/admin.js" type="module"></script>
+<script type="module">
+    import { deleteLink } from '/static/js/admin.js';
+    
+    // Assign the function to the global scope
+    window.deleteLink = deleteLink;
+  </script>
 {% endblock %}
